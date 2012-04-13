@@ -9,6 +9,7 @@ use Symfony\Component\ClassLoader\UniversalClassLoader;
 $loader = new UniversalClassLoader();
 
 $loader->registerNamespace('Symfony', __DIR__.'/vendor');
+$loader->registerNamespace('DS', __DIR__.'/src');
 $loader->register();
 //end - autoloading
 
@@ -16,7 +17,12 @@ set_time_limit(0);
 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
+use DS\DemoBundle\Command\GreetCommand;
+use DS\DemoBundle\Command\DatabaseInitCommand;
 
 $application = new Application('beez', '0.1');
+
+$application->add(new GreetCommand());
+$application->add(new DatabaseInitCommand());
 
 $application->run();
