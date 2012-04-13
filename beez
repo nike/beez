@@ -1,0 +1,22 @@
+#!/usr/bin/env php
+<?php
+
+//begin - autoloading
+require_once __DIR__.'/vendor/Symfony/Component/ClassLoader/UniversalClassLoader.php';
+
+use Symfony\Component\ClassLoader\UniversalClassLoader;
+
+$loader = new UniversalClassLoader();
+
+$loader->registerNamespace('Symfony', __DIR__.'/vendor');
+$loader->register();
+//end - autoloading
+
+set_time_limit(0);
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+
+$application = new Application('beez', '0.1');
+
+$application->run();
