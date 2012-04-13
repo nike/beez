@@ -13,3 +13,12 @@
 [submodule "vendor/Symfony/Component/Yaml"]
 	path = vendor/Symfony/Component/Yaml
 	url = git://github.com/symfony/Yaml.git
+[submodule "vendor/PHPUnit/phpunit"]
+	path = vendor/PHPUnit/phpunit
+	url = git://github.com/sebastianbergmann/phpunit.git
+[submodule "vendor/PHPUnit/phpunit-mock-objects"]
+	path = vendor/PHPUnit/phpunit-mock-objects
+	url = git://github.com/sebastianbergmann/phpunit-mock-objects.git
+[submodule "vendor/PHPUnit/phpunit-selenium"]
+	path = vendor/PHPUnit/phpunit-selenium
+	url = git://github.com/sebastianbergmann/phpunit-selenium.git
