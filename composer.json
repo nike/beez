@@ -1,0 +1,23 @@
+{
+	"repositories": [
+		{
+			"type": "package",
+			"package": {
+				"name": "phpunit/phpunit-mock-objects",
+				"version": "master",
+				"dist": {
+					"url": "https://github.com/sebastianbergmann/phpunit-mock-objects/zipball/master",
+					"type": "zip"
+				},
+				"source": {
+					"url": "git://github.com/sebastianbergmann/phpunit-mock-objects.git",
+					"type": "git",
+					"reference": "master"
+				}
+			}
+		}
+	],
+	"require": {
+		"phpunit/phpunit-mock-objects": "master"
+	}
+}

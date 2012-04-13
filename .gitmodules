@@ -13,3 +13,6 @@
 [submodule "vendor/Symfony/Component/Yaml"]
 	path = vendor/Symfony/Component/Yaml
 	url = git://github.com/symfony/Yaml.git
+[submodule "vendor/PHPUnit"]
+	path = vendor/PHPUnit
+	url = git://github.com/sebastianbergmann/phpunit.git
