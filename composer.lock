@@ -1,0 +1,16 @@
+{
+    "hash": "f5e09288e37949d44e26d9908d4b36de",
+    "packages": [
+        {
+            "package": "phpunit/phpunit",
+            "version": "master",
+            "source-reference": "master"
+        },
+        {
+            "package": "phpunit/phpunit-mock-objects",
+            "version": "master",
+            "source-reference": "master"
+        }
+    ],
+    "aliases": []
+}
