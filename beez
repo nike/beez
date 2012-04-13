@@ -19,10 +19,12 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use DS\DemoBundle\Command\GreetCommand;
 use DS\DemoBundle\Command\DatabaseInitCommand;
+use DS\DemoBundle\Command\FilesystemBackupCommand;
 
 $application = new Application('beez', '0.1');
 
 $application->add(new GreetCommand());
 $application->add(new DatabaseInitCommand());
+$application->add(new FilesystemBackupCommand());
 
 $application->run();
