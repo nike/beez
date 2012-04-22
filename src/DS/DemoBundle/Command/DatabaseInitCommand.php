@@ -8,11 +8,18 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
+use DS\DemoBundle\Command\ShellQueue;
 
 class DatabaseInitCommand extends Command
 {
-    protected $queue;
+
+    private $queue;
     
+    public function setQueue($queue)
+    {
+        $this->queue = $queue;
+    }
+
     protected function configure()
     {
         $this
@@ -24,8 +31,6 @@ class DatabaseInitCommand extends Command
           ->addOption('mysql-user', 'u', InputOption::VALUE_OPTIONAL, 'Mysql username (if not set, default user is "root")')
           ->addOption('mysql-pass', 'p', InputOption::VALUE_OPTIONAL, 'Mysql password (if not set, default no password)')
         ;
-        
-        $this->queue = array();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -37,20 +42,8 @@ class DatabaseInitCommand extends Command
         $mysqlPass = $input->getOption('mysql-pass') ? sprintf('-p%s', $input->getOption('mysql-pass')) : '';
 
         $commandLine = sprintf('mysqladmin %s %s create %s', $mysqlUser, $mysqlPass, $dbName);
-        
-        $this->queue[] = $commandLine;
 
-//        $process = new Process($commandLine);
-//
-//        if ($process->run()) {
-//            $output->writeln(sprintf('<error>%s:</error>', $process->getExitCodeText()));
-//            $output->writeln('');
-//            $output->writeln(sprintf('<error>%s</error>', $process->getErrorOutput()));
-//            return $process->getExitCode();
-//        } else {
-//            $output->writeln(sprintf('<info>%s</info>', $process->getErrorOutput()));
-//            $output->writeln(sprintf('<info>%s</info>', $process->getExitCodeText()));
-//        }
+        $this->queue->addCommandLine($commandLine);
 
         if ($dbUser) {
             $sql = sprintf('grant all privileges on %s.* to \'%s\'@\'localhost\'', $dbName, $dbUser);
@@ -60,24 +53,11 @@ class DatabaseInitCommand extends Command
             }
 
             $commandLine = sprintf('mysql %s %s -e "%s"', $mysqlUser, $mysqlPass, $sql);
-            
-            $this->queue[] = $commandLine;
 
-//            $process = new Process($commandLine);
-//
-//            if ($process->run()) {
-//                $output->writeln(sprintf('<error>%s:</error>', $process->getExitCodeText()));
-//                $output->writeln('');
-//                $output->writeln(sprintf('<error>%s</error>', $process->getErrorOutput()));
-//                return $process->getExitCode();
-//            } else {
-//                $output->writeln(sprintf('<info>%s</info>', $process->getErrorOutput()));
-//                $output->writeln(sprintf('<info>%s</info>', $process->getExitCodeText()));
-//            }
+            $this->queue->addCommandLine($commandLine);
         }
 
-        // Ok
-        return 0;
+        return $this->queue->run($output);
     }
 
 }

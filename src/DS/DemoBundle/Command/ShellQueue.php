@@ -37,12 +37,13 @@ class ShellQueue
         // Ok
         return 0;
     }
-    
+
     public function addCommandLine($commandLine)
     {
-        $this->queue[] = $commandLine;
+        if (!empty($commandLine))
+            $this->queue[] = $commandLine;
     }
-    
+
     public function printQueue(OutputInterface $output)
     {
         foreach ($this->queue as $item) {
