@@ -98,6 +98,10 @@ TXT;
     public function testStripMultipleSpacesInCommandLine()
     {
         $queue = new ShellQueue();
+        $commandLine = '   this  command    has    got multiple   spaces  ';
+        $actualResult = $queue->addCommandLine($commandLine);
+
+        $this->assertEquals('this command has got multiple spaces', $actualResult);
     }
 
 }

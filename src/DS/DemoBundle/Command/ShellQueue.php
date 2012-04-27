@@ -40,8 +40,13 @@ class ShellQueue
 
     public function addCommandLine($commandLine)
     {
-        if (!empty($commandLine))
+        if (!empty($commandLine)) {
+            $commandLine = preg_replace('/[ ]+/', ' ', trim($commandLine));
             $this->queue[] = $commandLine;
+            return $commandLine;
+        }
+        
+        return false;
     }
 
     public function printQueue(OutputInterface $output)
