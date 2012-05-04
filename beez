@@ -9,25 +9,19 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Finder\Finder;
 use DS\DemoBundle\Command\ShellQueue;
-//use DS\DemoBundle\Command\GreetCommand;
-//use DS\DemoBundle\Command\DatabaseInitCommand;
-//use DS\DemoBundle\Command\FilesystemBackupCommand;
 
 $application = new Application('beez', '0.1');
 
 $finder = new Finder();
-$finder->files()->name('*Command.php')->in(__DIR__ . '/src');
+$finder->files()->name('?*Command.php')->in(__DIR__ . '/src');
 
 foreach ($finder as $file) {
-//    $class = $file->getBasename('.php');
-    $class = "DS\DemoBundle\Command\DatabaseInitCommand";
-    $command = new $class();
-    $command->setQueue(new ShellQueue());
-    $application->add($command);
+    $r = new \ReflectionClass($file->getRelativePath() . '\\' . $file->getBasename('.php'));
+    if ($r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command') && !$r->isAbstract()) {
+        $command = $r->newInstance();
+        $command->setQueue(new ShellQueue());
+        $application->add($command);
+    }
 }
-//
-//$application->add(new GreetCommand());
-//$application->add(new DatabaseInitCommand());
-//$application->add(new FilesystemBackupCommand());
 
 $application->run();

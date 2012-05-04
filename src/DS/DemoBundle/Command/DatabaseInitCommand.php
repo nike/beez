@@ -2,23 +2,16 @@
 
 namespace DS\DemoBundle\Command;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
+use DS\DemoBundle\Command\Command;
 use DS\DemoBundle\Command\ShellQueue;
 
 class DatabaseInitCommand extends Command
 {
-
-    private $queue;
-
-    public function setQueue($queue)
-    {
-        $this->queue = $queue;
-    }
 
     protected function configure()
     {
