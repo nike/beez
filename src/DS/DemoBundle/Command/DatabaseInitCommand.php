@@ -23,11 +23,18 @@ class DatabaseInitCommand extends Command
           ->addArgument('db-pass', InputArgument::REQUIRED, 'Assign or change the password to the specified user')
           ->addOption('mysql-user', 'u', InputOption::VALUE_OPTIONAL, 'Mysql username (if not set, default user is "root")')
           ->addOption('mysql-pass', 'p', InputOption::VALUE_OPTIONAL, 'Mysql password (if not set, default no password)')
+          ->addOption('farlok', 'k', InputOption::VALUE_OPTIONAL, 'Mysql password (if not set, default no password)', 'def')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+//        foreach (array('db-name', 'db-user', 'db-pass') as $option) {
+//            if (null === $input->getOption($option)) {
+//                throw new \RuntimeException(sprintf('The "%s" option must be provided.', $option));
+//            }
+//        }
+
         $dbName = $input->getArgument('db-name');
         $dbUser = $input->getArgument('db-user');
         $dbPass = $input->getArgument('db-pass');
@@ -41,12 +48,50 @@ class DatabaseInitCommand extends Command
         $commandLine = sprintf('mysql %s %s -e "%s"', $mysqlUser, $mysqlPass, $sql);
         $this->queue->addCommandLine($commandLine);
 
-        $dialog = $this->getHelperSet()->get('dialog');
-        if (!$dialog->askConfirmation($output, '<question>Continue with this action?</question>', false)) {
-            return;
+        $dialog = $this->getDialogHelper();
+
+        if ($input->isInteractive()) {
+            $this->queue->printQueue($output);
+            if (!$dialog->askConfirmation($output, $dialog->getQuestion('Do you confirm generation', 'no', '?'), false)) {
+                $output->writeln('<error>Command aborted</error>');
+
+                return 1;
+            }
         }
 
         return $this->queue->run($output);
+    }
+
+    protected function interact(InputInterface $input, OutputInterface $output)
+    {
+        $dialog = $this->getDialogHelper();
+        
+        $arguments = $this->getDefinition()->getArguments();
+        $options = $this->getDefinition()->getOptions();
+
+        foreach ($arguments as $argument) {
+            $name = $argument->getName();
+            $value = $input->getArgument($name);
+            
+            if (!$value)
+                $value = $argument->getDefault();
+            
+            $value = $dialog->ask($output, $dialog->getQuestion($name, $value), $value);
+            
+            if ($value)
+                $input->setArgument($name, $value);
+        }
+        
+        foreach ($options as $option) {
+            $name = $option->getName();
+            $value = $input->getOption($name);
+            
+            if (!$value)
+                $value = $option->getDefault();
+            
+            $value = $dialog->ask($output, $dialog->getQuestion($name, $value), $value);
+            $input->setOption($name, $value);
+        }
     }
 
 }
