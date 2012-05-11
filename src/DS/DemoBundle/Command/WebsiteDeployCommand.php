@@ -31,6 +31,7 @@ class WebsiteDeployCommand extends Command
       ->addOption('db-name', '', InputOption::VALUE_REQUIRED, 'Database name')
       ->addOption('db-user', '', InputOption::VALUE_REQUIRED, 'Database user')
       ->addOption('db-pass', '', InputOption::VALUE_REQUIRED, 'Database pass')
+      ->addOption('init', 'i', InputOption::VALUE_NONE, 'First deploy')
 //      ->addOption('force', 'x', InputOption::VALUE_NONE, 'Force execution')
     ;
   }
@@ -100,6 +101,9 @@ class WebsiteDeployCommand extends Command
 
   protected function interact(InputInterface $input, OutputInterface $output)
   {
+    if (!$input->getOption('init'))
+      return;
+    
     $options = array(
       $this->getDefinition()->getOption('website-name'),
       $this->getDefinition()->getOption('web-source-dir'),
@@ -140,6 +144,9 @@ class WebsiteDeployCommand extends Command
 
       $input->setOption($name, $value);
     }
+    
+    
+    fputs(fopen('../config2.yml', 'w'), Yaml::dump($input->getOptions()));
   }
 
 }
