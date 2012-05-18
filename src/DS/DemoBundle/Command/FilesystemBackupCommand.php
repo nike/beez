@@ -41,21 +41,10 @@ class FilesystemBackupCommand extends Command
     // f: archive to file
     // C: root dir in the archived file
     $commandLine = sprintf('tar -czf %s/%s %s -C"%s"', $destination, $archiveName, $source, $archivePath);
-
-    $process = new Process($commandLine);
     
-    if ($process->run()) {
-      $output->writeln(sprintf('<error>%s:</error>', $process->getExitCodeText()));
-      $output->writeln('');
-      $output->writeln(sprintf('<error>%s</error>', $process->getErrorOutput()));
-      return $process->getExitCode();
-    } else {
-      $output->writeln(sprintf('<info>%s</info>', $process->getErrorOutput()));
-      $output->writeln(sprintf('<info>%s</info>', $process->getExitCodeText()));
-    }
+    $this->queue->addCommandLine($commandLine);
     
-    // Ok
-    return 0;
+    return $this->queue->run($output);
   }
 
 }

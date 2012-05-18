@@ -16,10 +16,11 @@ class WebsiteDeployCommand extends Command
 
   protected function configure()
   {
+    parent::configure();
+
     $this
       ->setName('website:deploy')
       ->setDescription('Deploy a website')
-      ->addArgument('configuration', InputArgument::OPTIONAL, 'Configuration file', '.beez/config.yml')
       ->addOption('website-name', '', InputOption::VALUE_REQUIRED, 'Website name')
       ->addOption('web-source-dir', '', InputOption::VALUE_REQUIRED, 'Website source directory')
       ->addOption('web-prod-dir', '', InputOption::VALUE_REQUIRED, 'Website production directory')
@@ -32,7 +33,6 @@ class WebsiteDeployCommand extends Command
       ->addOption('db-user', '', InputOption::VALUE_REQUIRED, 'Database user')
       ->addOption('db-pass', '', InputOption::VALUE_REQUIRED, 'Database pass')
       ->addOption('init', 'i', InputOption::VALUE_NONE, 'First deploy')
-//      ->addOption('force', 'x', InputOption::VALUE_NONE, 'Force execution')
     ;
   }
 
@@ -40,70 +40,67 @@ class WebsiteDeployCommand extends Command
   {
 //    $force = $input->getOption('force');
     // Load configuration
-    $configuration = Yaml::parse($input->getArgument('configuration'));
+
+    $this->loadConfiguration($input);
 
     // Variables from config
-    $websiteName = $input->getOption('website-name') ? $input->getOption('website-name') : $configuration['website_name'];
-    $excludeList = $input->getOption('exclude-file') ? $input->getOption('exclude-file') : $configuration['exclude_file'];
-    $includeList = $input->getOption('include-file') ? $input->getOption('include-file') : $configuration['include_file'];
-//    $deployDir = $configuration['deploy_dir'];
-    $backupSources = $input->getOption('backup-sources') ? $input->getOption('backup-sources') : $configuration['backup_sources'];
-    $backupDestination = $input->getOption('backup-destination') ? $input->getOption('backup-destination') : $configuration['backup_destination'];
-    $webSourceDir = $input->getOption('web-source-dir') ? $input->getOption('web-source-dir') : $configuration['web_source_dir'];
-    $webProdDir = $input->getOption('web-prod-dir') ? $input->getOption('web-prod-dir') : $configuration['web_prod_dir'];
-    $webUser = $input->getOption('web-user') ? $input->getOption('web-user') : $configuration['web_user'];
-//    $webGroup = $configuration['web_group'];
-    $dbName = $input->getOption('db-name') ? $input->getOption('db-name') : $configuration['db_name'];
-    $dbUser = $input->getOption('db-user') ? $input->getOption('db-user') : $configuration['db_user'];
-    $dbPass = $input->getOption('db-pass') ? $input->getOption('db-pass') : $configuration['db_pass'];
+    $websiteName = $input->getOption('website-name');
+    $excludeList = $input->getOption('exclude-file');
+    $includeList = $input->getOption('include-file');
+    //    $deployDir = $configuration['deploy_dir'];
+    $backupSources = $input->getOption('backup-sources');
+    $backupDestination = $input->getOption('backup-destination');
+    $webSourceDir = $input->getOption('web-source-dir');
+    $webProdDir = $input->getOption('web-prod-dir');
+    $webUser = $input->getOption('web-user');
+    //    $webGroup = $configuration['web_group'];
+    $dbName = $input->getOption('db-name');
+    $dbUser = $input->getOption('db-user');
+    $dbPass = $input->getOption('db-pass');
 
-    $o = array(
-      $websiteName,
-      $excludeList,
-      $includeList,
-      $backupSources,
-      $backupDestination,
-      $webSourceDir,
-      $webProdDir,
-      $webUser,
-      $dbName,
-      $dbUser,
-      $dbPass,
-    );
+    // Backup
+    if (!empty($backupSources) && !empty($backupDestination)) {
+      $command = $this->getApplication()->find('filesystem:backup');
+
+      $commandInput = new ArrayInput(array(
+        'source' => $backupSources[0],
+        'destination' => $backupDestination,
+      ));
+    }
     
-    print_r($o);
-//    // Archive site directory
-//    $cmd = new nbArchiveCommand();
-//    $cmdLine = sprintf('%s/%s.tgz %s --add-timestamp --force', $backupDestination, $websiteName, implode(' ', $backupSources));
-//    $this->executeCommand($cmd, $cmdLine, $force, $verbose);
-//
-//    // Dump database
-//    if ($dbName && $dbUser && $dbPass) {
-//      $cmd = new nbMysqlDumpCommand();
-//      $cmdLine = sprintf('%s %s %s %s', $dbName, $backupDestination, $dbUser, $dbPass);
-//      $this->executeCommand($cmd, $cmdLine, $force, $verbose);
-//    }
-//
-//    // Sync web directory
-//    $cmd = new nbDirTransferCommand();
-//    $delete = isset($options['delete']) ? '--delete' : '';
-//    $cmdLine = sprintf('%s %s --owner=%s --exclude-from=%s --include-from=%s %s %s',
-//      $webSourceDir,
-//      $webProdDir,
-//      $webUser,
-//      $excludeList,
-//      $includeList,
-//      $force ? '--doit' : '',
-//      $delete
-//    );
-//    $this->executeCommand($cmd, $cmdLine, true, $verbose);
+    if ($input->getOption('force')) {
+      
+    } else {
+      $this->queue->printQueue($output);
+    }
+    
+    //    // Dump database
+    //    if ($dbName && $dbUser && $dbPass) {
+    //      $cmd = new nbMysqlDumpCommand();
+    //      $cmdLine = sprintf('%s %s %s %s', $dbName, $backupDestination, $dbUser, $dbPass);
+    //      $this->executeCommand($cmd, $cmdLine, $force, $verbose);
+    //    }
+    //
+    //    // Sync web directory
+    //    $cmd = new nbDirTransferCommand();
+    //    $delete = isset($options['delete']) ? '--delete' : '';
+    //    $cmdLine = sprintf('%s %s --owner=%s --exclude-from=%s --include-from=%s %s %s',
+    //      $webSourceDir,
+    //      $webProdDir,
+    //      $webUser,
+    //      $excludeList,
+    //      $includeList,
+    //      $force ? '--doit' : '',
+    //      $delete
+    //    );
+    //    $this->executeCommand($cmd, $cmdLine, true, $verbose);
   }
 
   protected function interact(InputInterface $input, OutputInterface $output)
   {
     if (!$input->getOption('init'))
       return;
-    
+
     $options = array(
       $this->getDefinition()->getOption('website-name'),
       $this->getDefinition()->getOption('web-source-dir'),
@@ -144,8 +141,8 @@ class WebsiteDeployCommand extends Command
 
       $input->setOption($name, $value);
     }
-    
-    
+
+
     fputs(fopen('../config2.yml', 'w'), Yaml::dump($input->getOptions()));
   }
 
