@@ -17,7 +17,8 @@ class WebsiteInitCommand extends Command
   {
     $this
       ->setName('website:init')
-      ->setDescription(<<<TXT
+      ->setDescription('Initialize a website')
+      ->setHelp(<<<TXT
 Examples:
 
   Enables plugins required by <info>website:deploy</info>

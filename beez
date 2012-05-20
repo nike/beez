@@ -16,10 +16,10 @@ $finder = new Finder();
 $finder->files()->name('?*Command.php')->in(__DIR__ . '/src');
 
 foreach ($finder as $file) {
-    $r = new \ReflectionClass($file->getRelativePath() . '\\' . $file->getBasename('.php'));
+    $r = new \ReflectionClass(preg_replace('/\//', '\\', $file->getRelativePath() . '\\' . $file->getBasename('.php')));
     if ($r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command') && !$r->isAbstract()) {
         $command = $r->newInstance();
-        $command->setQueue(new ShellQueue());
+//        $command->setQueue(new ShellQueue());
         $application->add($command);
     }
 }

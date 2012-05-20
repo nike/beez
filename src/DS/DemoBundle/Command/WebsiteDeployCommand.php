@@ -6,18 +6,14 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 use DS\DemoBundle\Command\Command;
-use DS\DemoBundle\Command\ShellQueue;
 
 class WebsiteDeployCommand extends Command
 {
 
   protected function configure()
   {
-    parent::configure();
-
     $this
       ->setName('website:deploy')
       ->setDescription('Deploy a website')
@@ -33,6 +29,8 @@ class WebsiteDeployCommand extends Command
       ->addOption('db-user', '', InputOption::VALUE_REQUIRED, 'Database user')
       ->addOption('db-pass', '', InputOption::VALUE_REQUIRED, 'Database pass')
       ->addOption('init', 'i', InputOption::VALUE_NONE, 'First deploy')
+      ->addConfigurationArgument()
+      ->addForceOption()
     ;
   }
 
@@ -42,58 +40,51 @@ class WebsiteDeployCommand extends Command
     // Load configuration
 
     $this->loadConfiguration($input);
+//    $this->validateInput($input);
 
-    // Variables from config
     $websiteName = $input->getOption('website-name');
-    $excludeList = $input->getOption('exclude-file');
-    $includeList = $input->getOption('include-file');
-    //    $deployDir = $configuration['deploy_dir'];
+    $excludeFile = $input->getOption('exclude-file');
+    $includeFile = $input->getOption('include-file');
+//    $deployDir = $configuration['deploy_dir'];
     $backupSources = $input->getOption('backup-sources');
     $backupDestination = $input->getOption('backup-destination');
     $webSourceDir = $input->getOption('web-source-dir');
     $webProdDir = $input->getOption('web-prod-dir');
     $webUser = $input->getOption('web-user');
-    //    $webGroup = $configuration['web_group'];
+//    $webGroup = $configuration['web_group'];
     $dbName = $input->getOption('db-name');
     $dbUser = $input->getOption('db-user');
     $dbPass = $input->getOption('db-pass');
 
     // Backup
     if (!empty($backupSources) && !empty($backupDestination)) {
-      $command = $this->getApplication()->find('filesystem:backup');
-
-      $commandInput = new ArrayInput(array(
-        'source' => $backupSources[0],
+      $this->addCommand('filesystem:backup', array(
+        'sources' => $backupSources,
         'destination' => $backupDestination,
       ));
     }
     
-    if ($input->getOption('force')) {
-      
-    } else {
-      $this->queue->printQueue($output);
+    // Sync
+    if (!empty($webSourceDir) && !empty($webProdDir) /*&& !empty($webUser) && !empty($includeFile) && !empty($excludeFile)*/) {
+      $this->addCommand('filesystem:sync', array(
+        'source' => $webSourceDir,
+        'target' => $webProdDir,
+        '--owner' => $webUser,
+//        '--include-file' => $includeFile,
+//        '--exclude-file' => $excludeFile,
+        '--delete' => true,
+      ));
     }
     
-    //    // Dump database
-    //    if ($dbName && $dbUser && $dbPass) {
-    //      $cmd = new nbMysqlDumpCommand();
-    //      $cmdLine = sprintf('%s %s %s %s', $dbName, $backupDestination, $dbUser, $dbPass);
-    //      $this->executeCommand($cmd, $cmdLine, $force, $verbose);
-    //    }
-    //
-    //    // Sync web directory
-    //    $cmd = new nbDirTransferCommand();
-    //    $delete = isset($options['delete']) ? '--delete' : '';
-    //    $cmdLine = sprintf('%s %s --owner=%s --exclude-from=%s --include-from=%s %s %s',
-    //      $webSourceDir,
-    //      $webProdDir,
-    //      $webUser,
-    //      $excludeList,
-    //      $includeList,
-    //      $force ? '--doit' : '',
-    //      $delete
-    //    );
-    //    $this->executeCommand($cmd, $cmdLine, true, $verbose);
+    return parent::execute($input, $output);
+//    // Dump database
+//    if ($dbName && $dbUser && $dbPass) {
+//      $cmd = new nbMysqlDumpCommand();
+//      $cmdLine = sprintf('%s %s %s %s', $dbName, $backupDestination, $dbUser, $dbPass);
+//      $this->executeCommand($cmd, $cmdLine, $force, $verbose);
+//    }
+//
+//    $this->executeCommand($cmd, $cmdLine, true, $verbose);
   }
 
   protected function interact(InputInterface $input, OutputInterface $output)
