@@ -84,19 +84,19 @@ abstract class Command extends BaseCommand
         return $exitCode;
     }
   }
-  
+
   protected function addValidators($inputName, array $validators)
   {
     $this->validators[$inputName] = $validators;
   }
-  
+
   protected function validateInput(InputInterface $input)
   {
     foreach ($this->validators as $inputName => $validators) {
       foreach ($validators as $validator) {
         $value = $input->getOption($inputName);
         if (!$validator->validate($value))
-          throw new \InvalidArgumentException($validator->getMessage());
+          throw new \InvalidArgumentException(sprintf('%s [%s]: %s', $inputName, $value, $validator->getErrorMessage()));
       }
     }
   }

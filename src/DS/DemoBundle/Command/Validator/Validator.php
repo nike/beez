@@ -5,18 +5,18 @@ namespace DS\DemoBundle\Command\Validator;
 abstract class Validator
 {
 
-  private $message;
-  
-  public function __construct($message = '')
+  protected $errorMessage;
+
+  public function __construct()
   {
-    $this->message = $message;
+    $this->errorMessage = 'Not valid';
   }
-  
+
   public abstract function validate($value);
-  
-  public function getMessage()
+
+  public function getErrorMessage()
   {
-    return $this->message;
+    return $this->errorMessage;
   }
 
 }
