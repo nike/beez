@@ -15,6 +15,7 @@ abstract class Command extends BaseCommand
 {
 
   protected $commands = array();
+  protected $validators = array();
 
   protected function addConfigurationArgument()
   {
@@ -81,6 +82,22 @@ abstract class Command extends BaseCommand
 
       if ($exitCode)
         return $exitCode;
+    }
+  }
+  
+  protected function addValidators($inputName, array $validators)
+  {
+    $this->validators[$inputName] = $validators;
+  }
+  
+  protected function validateInput(InputInterface $input)
+  {
+    foreach ($this->validators as $inputName => $validators) {
+      foreach ($validators as $validator) {
+        $value = $input->getOption($inputName);
+        if (!$validator->validate($value))
+          throw new \InvalidArgumentException($validator->getMessage());
+      }
     }
   }
 

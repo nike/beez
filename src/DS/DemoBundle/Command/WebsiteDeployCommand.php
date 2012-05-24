@@ -8,6 +8,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use DS\DemoBundle\Command\Command;
+use DS\DemoBundle\Command\Validator\Required;
+use DS\DemoBundle\Command\Validator\FileExists;
+use DS\DemoBundle\Command\Validator\DirectoryExists;
 
 class WebsiteDeployCommand extends Command
 {
@@ -32,6 +35,11 @@ class WebsiteDeployCommand extends Command
       ->addConfigurationArgument()
       ->addForceOption()
     ;
+    
+    $this->addValidators('exclude-file', array(
+      new Required('Missing option'),
+      new FileExists('File does not exists')
+    ));
   }
 
   protected function execute(InputInterface $input, OutputInterface $output)
@@ -40,7 +48,7 @@ class WebsiteDeployCommand extends Command
     // Load configuration
 
     $this->loadConfiguration($input);
-//    $this->validateInput($input);
+    $this->validateInput($input);
 
     $websiteName = $input->getOption('website-name');
     $excludeFile = $input->getOption('exclude-file');
