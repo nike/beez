@@ -25,10 +25,10 @@ class FilesystemBackupCommand extends Command
   {
     $sources = $input->getArgument('sources');
     foreach ($sources as $key => $source) {
-      $sources[$key] = preg_replace('/\/+$/', '', $source);
+      $sources[$key] = $this->sanitizeDirectory($source);
     }
     
-    $destination = preg_replace('/\/+$/', '', $input->getArgument('destination'));
+    $destination = $this->sanitizeDirectory($input->getArgument('destination'));
     
     if (count($sources) == 1) {
       $archiveName = sprintf('%s-%s.tar.gz', basename($sources[0]), date('YmdHi', time()));

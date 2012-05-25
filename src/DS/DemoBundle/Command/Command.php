@@ -27,12 +27,12 @@ abstract class Command extends BaseCommand
   {
     return $this->addOption('force', 'x', InputOption::VALUE_NONE, 'Force execution');
   }
-  
+
   protected function isForced(InputInterface $input)
   {
     if ($input->hasOption('force'))
       return (true === $input->getOption('force'));
-    
+
     return true;
   }
 
@@ -97,14 +97,14 @@ abstract class Command extends BaseCommand
   protected function addArgumentValidators($argument, array $validators)
   {
     $this->argumentValidators[$argument] = $validators;
-    
+
     return $this;
   }
 
   protected function addOptionValidators($option, array $validators)
   {
     $this->optionValidators[$option] = $validators;
-    
+
     return $this;
   }
 
@@ -117,7 +117,7 @@ abstract class Command extends BaseCommand
           throw new \InvalidArgumentException(sprintf('%s [%s]: %s', $argument, $value, $validator->getErrorMessage()));
       }
     }
-    
+
     foreach ($this->optionValidators as $option => $validators) {
       foreach ($validators as $validator) {
         $value = $input->getOption($option);
@@ -125,6 +125,11 @@ abstract class Command extends BaseCommand
           throw new \InvalidArgumentException(sprintf('%s [%s]: %s', $option, $value, $validator->getErrorMessage()));
       }
     }
+  }
+
+  public function sanitizeDirectory($directory)
+  {
+    return preg_replace('/\/+$/', '', $directory) . '/';
   }
 
 }

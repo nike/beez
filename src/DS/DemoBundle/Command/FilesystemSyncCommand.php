@@ -52,8 +52,8 @@ class FilesystemSyncCommand extends Command
     $delete = $input->getOption('delete') ? '--delete' : '';
 
     // Trailing slash must be added after sanitize dir
-    $source = preg_replace('/\/+$/', '', $input->getArgument('source')) . '/';
-    $target = preg_replace('/\/+$/', '', $input->getArgument('target'));
+    $source = $this->sanitizeDirectory($input->getArgument('source'));
+    $target = $this->sanitizeDirectory($input->getArgument('target'));
     $dryRun = $this->isForced($input) ? '' : '--dry-run';
 
     $commandLine = sprintf('rsync -azoChpAv %s %s %s %s %s %s', $dryRun, $includeFile, $excludeFile, $delete, $source, $target);
