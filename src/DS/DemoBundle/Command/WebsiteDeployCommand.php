@@ -35,11 +35,10 @@ class WebsiteDeployCommand extends Command
       ->addConfigurationArgument()
       ->addForceOption()
     ;
-    
-    $this->addValidators('exclude-file', array(
-      new Required('Missing option'),
-      new FileExists('File does not exists')
-    ));
+
+    $this
+      ->addOptionValidators('exclude-file', array(new Required(), new FileExists()))
+    ;
   }
 
   protected function execute(InputInterface $input, OutputInterface $output)
@@ -71,9 +70,9 @@ class WebsiteDeployCommand extends Command
         'destination' => $backupDestination,
       ));
     }
-    
+
     // Sync
-    if (!empty($webSourceDir) && !empty($webProdDir) /*&& !empty($webUser) && !empty($includeFile) && !empty($excludeFile)*/) {
+    if (!empty($webSourceDir) && !empty($webProdDir) /* && !empty($webUser) && !empty($includeFile) && !empty($excludeFile) */) {
       $this->addCommand('filesystem:sync', array(
         'source' => $webSourceDir,
         'target' => $webProdDir,
@@ -83,7 +82,7 @@ class WebsiteDeployCommand extends Command
         '--delete' => true,
       ));
     }
-    
+
     return parent::execute($input, $output);
 //    // Dump database
 //    if ($dbName && $dbUser && $dbPass) {

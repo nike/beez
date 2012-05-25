@@ -9,6 +9,9 @@ class FileExists extends Validator
 
   public function validate($value)
   {
+    if (empty($value))
+      return true;
+
     if (is_dir($value)) {
       $this->errorMessage = 'The value is a directory not a file';
       return false;

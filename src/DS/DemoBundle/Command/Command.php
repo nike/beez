@@ -15,7 +15,8 @@ abstract class Command extends BaseCommand
 {
 
   protected $commands = array();
-  protected $validators = array();
+  protected $argumentValidators = array();
+  protected $optionValidators = array();
 
   protected function addConfigurationArgument()
   {
@@ -25,6 +26,14 @@ abstract class Command extends BaseCommand
   protected function addForceOption()
   {
     return $this->addOption('force', 'x', InputOption::VALUE_NONE, 'Force execution');
+  }
+  
+  protected function isForced(InputInterface $input)
+  {
+    if ($input->hasOption('force'))
+      return (true === $input->getOption('force'));
+    
+    return true;
   }
 
   protected function getDialogHelper()
@@ -85,18 +94,35 @@ abstract class Command extends BaseCommand
     }
   }
 
-  protected function addValidators($inputName, array $validators)
+  protected function addArgumentValidators($argument, array $validators)
   {
-    $this->validators[$inputName] = $validators;
+    $this->argumentValidators[$argument] = $validators;
+    
+    return $this;
+  }
+
+  protected function addOptionValidators($option, array $validators)
+  {
+    $this->optionValidators[$option] = $validators;
+    
+    return $this;
   }
 
   protected function validateInput(InputInterface $input)
   {
-    foreach ($this->validators as $inputName => $validators) {
+    foreach ($this->argumentValidators as $argument => $validators) {
       foreach ($validators as $validator) {
-        $value = $input->getOption($inputName);
+        $value = $input->getArgument($argument);
         if (!$validator->validate($value))
-          throw new \InvalidArgumentException(sprintf('%s [%s]: %s', $inputName, $value, $validator->getErrorMessage()));
+          throw new \InvalidArgumentException(sprintf('%s [%s]: %s', $argument, $value, $validator->getErrorMessage()));
+      }
+    }
+    
+    foreach ($this->optionValidators as $option => $validators) {
+      foreach ($validators as $validator) {
+        $value = $input->getOption($option);
+        if (!$validator->validate($value))
+          throw new \InvalidArgumentException(sprintf('%s [%s]: %s', $option, $value, $validator->getErrorMessage()));
       }
     }
   }

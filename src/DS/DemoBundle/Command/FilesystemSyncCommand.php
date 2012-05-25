@@ -7,6 +7,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use DS\DemoBundle\Command\Command;
+use DS\DemoBundle\Command\Validator\DirectoryExists;
+use DS\DemoBundle\Command\Validator\FileExists;
 
 class FilesystemSyncCommand extends Command
 {
@@ -18,23 +20,33 @@ class FilesystemSyncCommand extends Command
       ->setDescription('Synchronize two directories')
       ->addArgument('source', InputArgument::REQUIRED, 'Source directory')
       ->addArgument('target', InputArgument::REQUIRED, 'Directory to synchronize')
+      ->addOption('target', '', InputOption::VALUE_NONE, 'Delete files on destination when synchronize')
       ->addOption('delete', '', InputOption::VALUE_NONE, 'Delete files on destination when synchronize')
       ->addOption('include-file', '', InputOption::VALUE_REQUIRED, 'File that contains a list of include patterns')
       ->addOption('exclude-file', '', InputOption::VALUE_REQUIRED, 'File that contains a list of exclude patterns')
       ->addOption('owner', '', InputOption::VALUE_REQUIRED, 'Owner of the target directory')
       ->addForceOption()
     ;
+    
+    $this
+      ->addArgumentValidators('source', array(new DirectoryExists()))
+      ->addArgumentValidators('target', array(new DirectoryExists()))
+      ->addOptionValidators('include-file', array(new FileExists()))
+      ->addOptionValidators('exclude-file', array(new FileExists()))
+    ;
   }
 
   protected function execute(InputInterface $input, OutputInterface $output)
   {
+    $this->validateInput($input);
+    
     $includeFile = $input->getOption('include-file');
     $excludeFile = $input->getOption('exclude-file');
     
-    if ($includeFile && file_exists($includeFile))
+    if ($includeFile)
       $includeFile = sprintf('--include-from "%s"', $includeFile);
     
-    if ($excludeFile && file_exists($excludeFile))
+    if ($excludeFile)
       $excludeFile = sprintf('--exclude-from "%s"', $excludeFile);
 
     $delete = $input->getOption('delete') ? '--delete' : '';
@@ -42,8 +54,9 @@ class FilesystemSyncCommand extends Command
     // Trailing slash must be added after sanitize dir
     $source = preg_replace('/\/+$/', '', $input->getArgument('source')) . '/';
     $target = preg_replace('/\/+$/', '', $input->getArgument('target'));
+    $dryRun = $this->isForced($input) ? '' : '--dry-run';
 
-    $commandLine = sprintf('rsync -azoChpAv %s %s %s %s %s %s', $force, $includeFile, $excludeFile, $delete, $source, $target);
+    $commandLine = sprintf('rsync -azoChpAv %s %s %s %s %s %s', $dryRun, $includeFile, $excludeFile, $delete, $source, $target);
 
     $owner = $input->getOption('owner');
     if ($owner)
