@@ -77,7 +77,6 @@ abstract class Command extends BaseCommand
   protected function addCommandLine($commandLine)
   {
     $this->addCommand('shell:execute', array(
-//      'command-line' => sprintf('%s', $commandLine),
       'command-line' => $commandLine,
     ));
   }

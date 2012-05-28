@@ -23,6 +23,7 @@ class DatabaseInitCommand extends Command
       ->addArgument('db-pass', InputArgument::REQUIRED, 'Assign or change the password to the specified user')
       ->addOption('mysql-user', 'u', InputOption::VALUE_OPTIONAL, 'Mysql username (if not set, default user is "root")')
       ->addOption('mysql-pass', 'p', InputOption::VALUE_OPTIONAL, 'Mysql password (if not set, default no password)')
+      ->addForceOption()
     ;
   }
 
@@ -35,28 +36,19 @@ class DatabaseInitCommand extends Command
     $mysqlPass = $input->getOption('mysql-pass') ? sprintf('-p %s', $input->getOption('mysql-pass')) : '';
 
     $commandLine = sprintf('mysqladmin %s %s create %s', $mysqlUser, $mysqlPass, $dbName);
-    $this->queue->addCommandLine($commandLine);
+    $this->addCommandLine($commandLine);
 
     $sql = sprintf('grant all privileges on %s.* to \'%s\'@\'localhost\' identified by \'%s\'', $dbName, $dbUser, $dbPass);
     $commandLine = sprintf('mysql %s %s -e "%s"', $mysqlUser, $mysqlPass, $sql);
-    $this->queue->addCommandLine($commandLine);
-
-    $dialog = $this->getDialogHelper();
-
-    if ($input->isInteractive()) {
-      $this->queue->printQueue($output);
-      if (!$dialog->askConfirmation($output, $dialog->getQuestion('Do you confirm generation', 'no', '?'), false)) {
-        $output->writeln('<error>Command aborted</error>');
-
-        return 1;
-      }
-    }
-
-    return $this->queue->run($output);
+    $this->addCommandLine($commandLine);
+    
+    return parent::execute($input, $output);
   }
 
   protected function interact(InputInterface $input, OutputInterface $output)
   {
+    return;
+    
     $dialog = $this->getDialogHelper();
 
     $arguments = array(

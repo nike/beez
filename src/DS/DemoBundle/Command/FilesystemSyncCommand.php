@@ -20,7 +20,6 @@ class FilesystemSyncCommand extends Command
       ->setDescription('Synchronize two directories')
       ->addArgument('source', InputArgument::REQUIRED, 'Source directory')
       ->addArgument('target', InputArgument::REQUIRED, 'Directory to synchronize')
-      ->addOption('target', '', InputOption::VALUE_NONE, 'Delete files on destination when synchronize')
       ->addOption('delete', '', InputOption::VALUE_NONE, 'Delete files on destination when synchronize')
       ->addOption('include-file', '', InputOption::VALUE_REQUIRED, 'File that contains a list of include patterns')
       ->addOption('exclude-file', '', InputOption::VALUE_REQUIRED, 'File that contains a list of exclude patterns')
@@ -51,7 +50,6 @@ class FilesystemSyncCommand extends Command
 
     $delete = $input->getOption('delete') ? '--delete' : '';
 
-    // Trailing slash must be added after sanitize dir
     $source = $this->sanitizeDirectory($input->getArgument('source'));
     $target = $this->sanitizeDirectory($input->getArgument('target'));
     $dryRun = $this->isForced($input) ? '' : '--dry-run';
