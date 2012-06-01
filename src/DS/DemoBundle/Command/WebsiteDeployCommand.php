@@ -43,9 +43,6 @@ class WebsiteDeployCommand extends Command
 
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-//    $force = $input->getOption('force');
-    // Load configuration
-
     $this->loadConfiguration($input);
     $this->validateInput($input);
 

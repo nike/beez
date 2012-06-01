@@ -81,7 +81,8 @@ abstract class Command extends BaseCommand
     ));
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
+//  protected function execute(InputInterface $input, OutputInterface $output)
+  protected function doit(OutputInterface $output)
   {
     $exitCode = 0; //Ok
 
@@ -91,6 +92,29 @@ abstract class Command extends BaseCommand
       if ($exitCode)
         return $exitCode;
     }
+  }
+
+  protected function dryrun(OutputInterface $output)
+  {
+    foreach ($this->commands as $command) {
+      if (method_exists($command['command'], 'show'))
+        $command['command']->show($command['input'], $output);
+      else
+        $this->showCommand($command['command'], $command['input'], $output);
+    }
+  }
+
+  protected function showCommand(BaseCommand $command, ArrayInput $input, OutputInterface $output)
+  {
+//    $commandName = $command->getName();
+//    $argumentList = '';
+//    $optionList = '';
+//
+//    $input->getParameterOption('command-line');
+//    foreach ($input->getArguments() as $argument) {
+//      $argumentList .= $argument->getA
+//    }
+//    $output->writeln(sprintf('<info>%s %s %s</info>', $command->getName(), implode(' ', $input->getArguments()), implode(' ', $input->getArguments())));
   }
 
   protected function addArgumentValidators($argument, array $validators)

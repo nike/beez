@@ -41,14 +41,17 @@ class DatabaseInitCommand extends Command
     $sql = sprintf('grant all privileges on %s.* to \'%s\'@\'localhost\' identified by \'%s\'', $dbName, $dbUser, $dbPass);
     $commandLine = sprintf('mysql %s %s -e "%s"', $mysqlUser, $mysqlPass, $sql);
     $this->addCommandLine($commandLine);
+
+    if ($this->isForced($input))
+      return $this->doit($output);
     
-    return parent::execute($input, $output);
+    return $this->dryrun($output);
   }
 
   protected function interact(InputInterface $input, OutputInterface $output)
   {
     return;
-    
+
     $dialog = $this->getDialogHelper();
 
     $arguments = array(
