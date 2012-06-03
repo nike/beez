@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use DS\DemoBundle\Command\Command;
+use DS\DemoBundle\Command\Validator\DirectoryExists;
 
 class FilesystemBackupCommand extends Command
 {
@@ -18,6 +19,11 @@ class FilesystemBackupCommand extends Command
       ->setDescription('Backup directories')
       ->addArgument('destination', InputArgument::REQUIRED, 'Directory where to put the archive')
       ->addArgument('sources', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Directories to backup')
+    ;
+    
+    $this
+      ->addArgumentValidators('destination', array(new DirectoryExists()))
+      ->addArgumentValidators('sources', array(new DirectoryExists()))
     ;
   }
 
@@ -48,9 +54,9 @@ class FilesystemBackupCommand extends Command
     // C: root dir in the archived file
     $commandLine = sprintf('tar -czf %s/%s %s', $destination, $archiveName, implode(' ', $sources));
 
-    $this->addCommandLine($commandLine);
+    $this->addShellCommand($commandLine);
 
-    return parent::execute($input, $output);
+    return $this->executeCommands($output);
   }
 
 }

@@ -6,9 +6,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 use DS\DemoBundle\Command\Command;
-use DS\DemoBundle\Command\ShellQueue;
 
 class DatabaseInitCommand extends Command
 {
@@ -17,7 +15,7 @@ class DatabaseInitCommand extends Command
   {
     $this
       ->setName('database:init')
-      ->setDescription('Creates a mysql database and assigns privileges to the specified user')
+      ->setDescription('Create a mysql database and assign privileges to the specified user')
       ->addArgument('db-name', InputArgument::REQUIRED, 'Database name')
       ->addArgument('db-user', InputArgument::REQUIRED, 'If user does not exist, it will be created')
       ->addArgument('db-pass', InputArgument::REQUIRED, 'Assign or change the password to the specified user')
@@ -36,16 +34,22 @@ class DatabaseInitCommand extends Command
     $mysqlPass = $input->getOption('mysql-pass') ? sprintf('-p %s', $input->getOption('mysql-pass')) : '';
 
     $commandLine = sprintf('mysqladmin %s %s create %s', $mysqlUser, $mysqlPass, $dbName);
-    $this->addCommandLine($commandLine);
+    $this->addShellCommand($commandLine);
 
     $sql = sprintf('grant all privileges on %s.* to \'%s\'@\'localhost\' identified by \'%s\'', $dbName, $dbUser, $dbPass);
     $commandLine = sprintf('mysql %s %s -e "%s"', $mysqlUser, $mysqlPass, $sql);
-    $this->addCommandLine($commandLine);
+    $this->addShellCommand($commandLine);
 
-    if ($this->isForced($input))
-      return $this->doit($output);
+    if (!$this->isForced($input)) {
+      $output->writeln(sprintf(
+        '<info>%s</info> %s %s %s --mysql-user=%s --mysql-pass=%s',
+        $this->getName(), $dbName, $dbUser, $dbPass, $mysqlUser, $mysqlPass
+      ));
+      
+      return 0;
+    }
     
-    return $this->dryrun($output);
+    return $this->executeCommands($output);
   }
 
   protected function interact(InputInterface $input, OutputInterface $output)

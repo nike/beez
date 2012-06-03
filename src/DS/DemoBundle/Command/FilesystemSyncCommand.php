@@ -60,9 +60,9 @@ class FilesystemSyncCommand extends Command
     if ($owner)
       $commandLine = sprintf('sudo -u %s %s', $owner, $commandLine);
     
-    $this->addCommandLine($commandLine);
+    $this->addShellCommand($commandLine);
     
-    return parent::execute($input, $output);
+    return $this->executeCommands($output);
   }
 
 }
