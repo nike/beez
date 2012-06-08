@@ -45,7 +45,7 @@ class WebsiteDeployCommand extends CompositeCommand
     ;
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
+  protected function initialize(InputInterface $input, OutputInterface $output)
   {
     $this->loadConfiguration($input);
     $this->validateInput($input);
@@ -72,18 +72,19 @@ class WebsiteDeployCommand extends CompositeCommand
       ), $output);
     }
 
-    // Dump database
-    if ($dbName && $dbUser && $dbPass) {
-      $this->addCommand('database:dump', array(
+    // Dump
+    if (!empty($dbName) && !empty($dbUser) && !empty($dbPass)) {
+      $this->addCommandArray(array(
+        'command' => 'database:dump',
         'destination' => $backupDestination,
         'db-name' => $dbName,
         'db-user' => $dbUser,
         'db-pass' => $dbPass,
-      ));
+      ), $output);
     }
 
     // Sync
-    if (!empty($webSourceDir) && !empty($webProdDir) /* && !empty($webUser) && !empty($includeFile) && !empty($excludeFile) */) {
+    if (!empty($webSourceDir) && !empty($webProdDir)  && !empty($webUser) && !empty($includeFile) && !empty($excludeFile)) {
       $this->addCommandArray(array(
         'command' => 'filesystem:sync',
         'source' => $webSourceDir,
@@ -94,15 +95,6 @@ class WebsiteDeployCommand extends CompositeCommand
         '--delete' => true,
       ), $output);
     }
-
-//    // Dump database
-//    if ($dbName && $dbUser && $dbPass) {
-//      $cmd = new nbMysqlDumpCommand();
-//      $cmdLine = sprintf('%s %s %s %s', $dbName, $backupDestination, $dbUser, $dbPass);
-//      $this->executeCommand($cmd, $cmdLine, $force, $verbose);
-//    }
-//
-//    $this->executeCommand($cmd, $cmdLine, true, $verbose);
   }
 
   protected function interact(InputInterface $input, OutputInterface $output)

@@ -67,9 +67,11 @@ abstract class CompositeCommand extends Command
   {
     $command = $this->getApplication()->find($args['command']);
     $input = new ArrayInput($args);
-    $command->initialize($input, $output);
 
-    $this->commands[] = $command;
+    $this->commands[] = array(
+      'command' => $command,
+      'input' => $input,
+    );
   }
 
   protected function addCommandLine($commandLine, OutputInterface $output)
@@ -78,23 +80,30 @@ abstract class CompositeCommand extends Command
       'command' => 'shell:execute',
       'command-line' => $commandLine,
     );
-    
+
     $this->addCommandArray($array, $output);
   }
-  
+
   protected function addCommandClosure(\Closure $closure)
   {
-    $command = new BaseCommand();
+    $command = new Command();
     $command->setCode($closure);
-    
-    // TODO: must the command be initilized?
-    $this->commands[] = $command;
+
+    $this->commands[] = array(
+      'command' => $command,
+      'input' => new ArrayInput(),
+    );
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
+  public function initialize(InputInterface $input, OutputInterface $output)
   {
-    throw new \LogicException('[CompositeCommand::execute] input is alreay in command...');
-    
+    foreach ($this->commands as $command) {
+      $command['command']->initialize($command['input'], $output);
+    }
+  }
+  
+  public function execute(InputInterface $input, OutputInterface $output)
+  {
     $exitCode = 0; //Ok
 
     foreach ($this->commands as $command) {
@@ -137,7 +146,7 @@ abstract class CompositeCommand extends Command
       }
     }
   }
-  
+
   public function sanitizeDirectory($directory)
   {
     return preg_replace('/\/+$/', '', $directory) . '/';
