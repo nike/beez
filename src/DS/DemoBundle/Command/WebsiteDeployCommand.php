@@ -7,12 +7,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
-use DS\DemoBundle\Command\Command;
+use DS\DemoBundle\Command\CompositeCommand;
 use DS\DemoBundle\Command\Validator\Required;
 use DS\DemoBundle\Command\Validator\FileExists;
 use DS\DemoBundle\Command\Validator\DirectoryExists;
 
-class WebsiteDeployCommand extends Command
+class WebsiteDeployCommand extends CompositeCommand
 {
 
   protected function configure()
@@ -62,25 +62,26 @@ class WebsiteDeployCommand extends Command
 
     // Backup
     if (!empty($backupSources) && !empty($backupDestination)) {
-      $this->addCommand('filesystem:backup', array(
+      $this->addCommandArray(array(
+        'command' => 'filesystem:backup',
         'sources' => $backupSources,
         'destination' => $backupDestination,
-      ));
+      ), $output);
     }
 
     // Sync
     if (!empty($webSourceDir) && !empty($webProdDir) /* && !empty($webUser) && !empty($includeFile) && !empty($excludeFile) */) {
-      $this->addCommand('filesystem:sync', array(
+      $this->addCommandArray(array(
+        'command' => 'filesystem:sync',
         'source' => $webSourceDir,
         'target' => $webProdDir,
         '--owner' => $webUser,
-//        '--include-file' => $includeFile,
-//        '--exclude-file' => $excludeFile,
+        '--include-file' => $includeFile,
+        '--exclude-file' => $excludeFile,
         '--delete' => true,
-      ));
+      ), $output);
     }
 
-    return parent::execute($input, $output);
 //    // Dump database
 //    if ($dbName && $dbUser && $dbPass) {
 //      $cmd = new nbMysqlDumpCommand();

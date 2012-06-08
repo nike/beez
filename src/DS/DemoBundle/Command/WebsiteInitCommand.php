@@ -7,10 +7,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
-use DS\DemoBundle\Command\Command;
+use DS\DemoBundle\Command\CompositeCommand;
 use DS\DemoBundle\Command\ShellQueue;
 
-class WebsiteInitCommand extends Command
+class WebsiteInitCommand extends CompositeCommand
 {
 
   protected function configure()

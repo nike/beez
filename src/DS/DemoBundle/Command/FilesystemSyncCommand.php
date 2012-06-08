@@ -6,11 +6,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use DS\DemoBundle\Command\Command;
+use DS\DemoBundle\Command\CompositeCommand;
 use DS\DemoBundle\Command\Validator\DirectoryExists;
 use DS\DemoBundle\Command\Validator\FileExists;
 
-class FilesystemSyncCommand extends Command
+class FilesystemSyncCommand extends CompositeCommand
 {
 
   protected function configure()
@@ -35,7 +35,7 @@ class FilesystemSyncCommand extends Command
     ;
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
+  protected function initialize(InputInterface $input, OutputInterface $output)
   {
     $this->validateInput($input);
     
@@ -60,9 +60,7 @@ class FilesystemSyncCommand extends Command
     if ($owner)
       $commandLine = sprintf('sudo -u %s %s', $owner, $commandLine);
     
-    $this->addCommandLine($commandLine);
-    
-    return parent::execute($input, $output);
+    $this->addCommandLine($commandLine, $output);
   }
 
 }

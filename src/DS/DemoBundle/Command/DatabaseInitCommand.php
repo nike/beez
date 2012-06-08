@@ -7,10 +7,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
-use DS\DemoBundle\Command\Command;
+use DS\DemoBundle\Command\CompositeCommand;
 use DS\DemoBundle\Command\ShellQueue;
 
-class DatabaseInitCommand extends Command
+class DatabaseInitCommand extends CompositeCommand
 {
 
   protected function configure()
@@ -27,7 +27,7 @@ class DatabaseInitCommand extends Command
     ;
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
+  protected function initialize(InputInterface $input, OutputInterface $output)
   {
     $dbName = $input->getArgument('db-name');
     $dbUser = $input->getArgument('db-user');
@@ -36,16 +36,14 @@ class DatabaseInitCommand extends Command
     $mysqlPass = $input->getOption('mysql-pass') ? sprintf('-p %s', $input->getOption('mysql-pass')) : '';
 
     $commandLine = sprintf('mysqladmin %s %s create %s', $mysqlUser, $mysqlPass, $dbName);
-    $this->addCommandLine($commandLine);
+    $this->addCommandLine($commandLine, $output);
 
     $sql = sprintf('grant all privileges on %s.* to \'%s\'@\'localhost\' identified by \'%s\'', $dbName, $dbUser, $dbPass);
     $commandLine = sprintf('mysql %s %s -e "%s"', $mysqlUser, $mysqlPass, $sql);
-    $this->addCommandLine($commandLine);
+    $this->addCommandLine($commandLine, $output);
 
-    if ($this->isForced($input))
-      return $this->doit($output);
-    
-    return $this->dryrun($output);
+//    if (!$this->isForced($input))
+//      $this->dryrun($output);
   }
 
   protected function interact(InputInterface $input, OutputInterface $output)

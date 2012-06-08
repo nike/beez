@@ -2,7 +2,7 @@
 
 namespace DS\DemoBundle\Command;
 
-use Symfony\Component\Console\Command\Command as BaseCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use DS\DemoBundle\Command\Helper\DialogHelper;
 
-abstract class Command extends BaseCommand
+abstract class CompositeCommand extends Command
 {
 
   protected $commands = array();
@@ -63,22 +63,32 @@ abstract class Command extends BaseCommand
     }
   }
 
-  protected function addCommand($name, array $args)
+  protected function addCommandArray(array $args, OutputInterface $output)
   {
-    $command = $this->getApplication()->find($name);
-    $input = new ArrayInput(array_merge(array($name), $args));
+    $command = $this->getApplication()->find($args['command']);
+    $input = new ArrayInput($args);
+    $command->initialize($input, $output);
 
-    $this->commands[] = array(
-      'command' => $command,
-      'input' => $input,
-    );
+    $this->commands[] = $command;
   }
 
-  protected function addCommandLine($commandLine)
+  protected function addCommandLine($commandLine, OutputInterface $output)
   {
-    $this->addCommand('shell:execute', array(
+    $array = array(
+      'command' => 'shell:execute',
       'command-line' => $commandLine,
-    ));
+    );
+    
+    $this->addCommandArray($array, $output);
+  }
+  
+  protected function addCommandClosure(\Closure $closure)
+  {
+    $command = new BaseCommand();
+    $command->setCode($closure);
+    
+    // TODO: must the command be initilized?
+    $this->commands[] = $command;
   }
 
 //  protected function execute(InputInterface $input, OutputInterface $output)
