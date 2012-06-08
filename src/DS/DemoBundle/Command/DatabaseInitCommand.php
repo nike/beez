@@ -17,7 +17,7 @@ class DatabaseInitCommand extends CompositeCommand
   {
     $this
       ->setName('database:init')
-      ->setDescription('Creates a mysql database and assigns privileges to the specified user')
+      ->setDescription('Create a mysql database and assign privileges to the specified user')
       ->addArgument('db-name', InputArgument::REQUIRED, 'Database name')
       ->addArgument('db-user', InputArgument::REQUIRED, 'If user does not exist, it will be created')
       ->addArgument('db-pass', InputArgument::REQUIRED, 'Assign or change the password to the specified user')
@@ -36,6 +36,7 @@ class DatabaseInitCommand extends CompositeCommand
     $mysqlPass = $input->getOption('mysql-pass') ? sprintf('-p %s', $input->getOption('mysql-pass')) : '';
 
     $commandLine = sprintf('mysqladmin %s %s create %s', $mysqlUser, $mysqlPass, $dbName);
+
     $this->addCommandLine($commandLine, $output);
 
     $sql = sprintf('grant all privileges on %s.* to \'%s\'@\'localhost\' identified by \'%s\'', $dbName, $dbUser, $dbPass);

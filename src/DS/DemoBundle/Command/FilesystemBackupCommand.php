@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use DS\DemoBundle\Command\CompositeCommand;
+use DS\DemoBundle\Command\Validator\DirectoryExists;
 
 class FilesystemBackupCommand extends CompositeCommand
 {
@@ -19,10 +20,17 @@ class FilesystemBackupCommand extends CompositeCommand
       ->addArgument('destination', InputArgument::REQUIRED, 'Directory where to put the archive')
       ->addArgument('sources', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Directories to backup')
     ;
+    
+    $this
+      ->addArgumentValidators('destination', array(new DirectoryExists()))
+      ->addArgumentValidators('sources', array(new DirectoryExists()))
+    ;
   }
 
   protected function initialize(InputInterface $input, OutputInterface $output)
   {
+    $this->validateInput($input);
+    
     $sources = $input->getArgument('sources');
     foreach ($sources as $key => $source) {
       $sources[$key] = $this->sanitizeDirectory($source);

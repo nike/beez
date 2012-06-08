@@ -20,7 +20,6 @@ class WebsiteDeployCommand extends CompositeCommand
     $this
       ->setName('website:deploy')
       ->setDescription('Deploy a website')
-      ->addOption('website-name', '', InputOption::VALUE_REQUIRED, 'Website name')
       ->addOption('web-source-dir', '', InputOption::VALUE_REQUIRED, 'Website source directory')
       ->addOption('web-prod-dir', '', InputOption::VALUE_REQUIRED, 'Website production directory')
       ->addOption('web-user', '', InputOption::VALUE_REQUIRED, 'Website user')
@@ -31,13 +30,18 @@ class WebsiteDeployCommand extends CompositeCommand
       ->addOption('db-name', '', InputOption::VALUE_REQUIRED, 'Database name')
       ->addOption('db-user', '', InputOption::VALUE_REQUIRED, 'Database user')
       ->addOption('db-pass', '', InputOption::VALUE_REQUIRED, 'Database pass')
-      ->addOption('init', 'i', InputOption::VALUE_NONE, 'First deploy')
+//      ->addOption('init', 'i', InputOption::VALUE_NONE, 'First deploy')
       ->addConfigurationArgument()
       ->addForceOption()
     ;
 
     $this
+      ->addOptionValidators('web-source-dir', array(new Required(), new DirectoryExists()))
+      ->addOptionValidators('web-prod-dir', array(new Required(), new DirectoryExists()))
       ->addOptionValidators('exclude-file', array(new Required(), new FileExists()))
+      ->addOptionValidators('include-file', array(new Required(), new FileExists()))
+      ->addOptionValidators('backup-sources', array(new Required(), new DirectoryExists()))
+      ->addOptionValidators('backup-destination', array(new Required(), new DirectoryExists()))
     ;
   }
 
@@ -46,7 +50,6 @@ class WebsiteDeployCommand extends CompositeCommand
     $this->loadConfiguration($input);
     $this->validateInput($input);
 
-    $websiteName = $input->getOption('website-name');
     $excludeFile = $input->getOption('exclude-file');
     $includeFile = $input->getOption('include-file');
 //    $deployDir = $configuration['deploy_dir'];
@@ -67,6 +70,16 @@ class WebsiteDeployCommand extends CompositeCommand
         'sources' => $backupSources,
         'destination' => $backupDestination,
       ), $output);
+    }
+
+    // Dump database
+    if ($dbName && $dbUser && $dbPass) {
+      $this->addCommand('database:dump', array(
+        'destination' => $backupDestination,
+        'db-name' => $dbName,
+        'db-user' => $dbUser,
+        'db-pass' => $dbPass,
+      ));
     }
 
     // Sync

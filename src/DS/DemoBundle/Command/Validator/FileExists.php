@@ -9,17 +9,21 @@ class FileExists extends Validator
 
   public function validate($value)
   {
-    if (empty($value))
+    $values = (array) $value;
+
+    if (count($values) == 0)
       return true;
 
-    if (is_dir($value)) {
-      $this->errorMessage = 'The value is a directory not a file';
-      return false;
-    }
+    foreach ($values as $v) {
+      if (is_dir($v)) {
+        $this->errorMessage = sprintf('The value "%s" is a directory not a file', $v);
+        return false;
+      }
 
-    if (!file_exists($value)) {
-      $this->errorMessage = 'The file does not exist';
-      return false;
+      if (!file_exists($v)) {
+        $this->errorMessage = sprintf('The file "%s" does not exist', $v);
+        return false;
+      }
     }
 
     return true;

@@ -91,9 +91,10 @@ abstract class CompositeCommand extends Command
     $this->commands[] = $command;
   }
 
-//  protected function execute(InputInterface $input, OutputInterface $output)
-  protected function doit(OutputInterface $output)
+  protected function execute(InputInterface $input, OutputInterface $output)
   {
+    throw new \LogicException('[CompositeCommand::execute] input is alreay in command...');
+    
     $exitCode = 0; //Ok
 
     foreach ($this->commands as $command) {
@@ -102,29 +103,6 @@ abstract class CompositeCommand extends Command
       if ($exitCode)
         return $exitCode;
     }
-  }
-
-  protected function dryrun(OutputInterface $output)
-  {
-    foreach ($this->commands as $command) {
-      if (method_exists($command['command'], 'show'))
-        $command['command']->show($command['input'], $output);
-      else
-        $this->showCommand($command['command'], $command['input'], $output);
-    }
-  }
-
-  protected function showCommand(BaseCommand $command, ArrayInput $input, OutputInterface $output)
-  {
-//    $commandName = $command->getName();
-//    $argumentList = '';
-//    $optionList = '';
-//
-//    $input->getParameterOption('command-line');
-//    foreach ($input->getArguments() as $argument) {
-//      $argumentList .= $argument->getA
-//    }
-//    $output->writeln(sprintf('<info>%s %s %s</info>', $command->getName(), implode(' ', $input->getArguments()), implode(' ', $input->getArguments())));
   }
 
   protected function addArgumentValidators($argument, array $validators)
@@ -159,7 +137,7 @@ abstract class CompositeCommand extends Command
       }
     }
   }
-
+  
   public function sanitizeDirectory($directory)
   {
     return preg_replace('/\/+$/', '', $directory) . '/';
