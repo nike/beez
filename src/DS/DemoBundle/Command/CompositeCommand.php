@@ -95,14 +95,14 @@ abstract class CompositeCommand extends Command
     );
   }
 
-  public function initialize(InputInterface $input, OutputInterface $output)
-  {
-    foreach ($this->commands as $command) {
-      $command['command']->initialize($command['input'], $output);
-    }
-  }
-  
-  public function execute(InputInterface $input, OutputInterface $output)
+//  protected function initialize(InputInterface $input, OutputInterface $output)
+//  {
+//    foreach ($this->commands as $command) {
+//      $command['command']->initialize($command['input'], $output);
+//    }
+//  }
+//  
+  protected function execute(InputInterface $input, OutputInterface $output)
   {
     $exitCode = 0; //Ok
 

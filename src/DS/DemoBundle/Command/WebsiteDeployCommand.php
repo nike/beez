@@ -95,6 +95,8 @@ class WebsiteDeployCommand extends CompositeCommand
         '--delete' => true,
       ), $output);
     }
+    
+    parent::initialize($input, $output);
   }
 
   protected function interact(InputInterface $input, OutputInterface $output)
