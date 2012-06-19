@@ -41,7 +41,7 @@ class WebsiteDeployCommand extends CompositeCommand
       ->addOptionValidators('exclude-file', array(new Required(), new FileExists()))
       ->addOptionValidators('include-file', array(new Required(), new FileExists()))
       ->addOptionValidators('backup-sources', array(new Required(), new DirectoryExists()))
-      ->addOptionValidators('backup-destination', array(new Required(), new DirectoryExists()))
+//      ->addOptionValidators('backup-destination', array(new Required(), new DirectoryExists()))
     ;
   }
 
@@ -64,7 +64,7 @@ class WebsiteDeployCommand extends CompositeCommand
     $dbPass = $input->getOption('db-pass');
 
     // Backup
-    if (!empty($backupSources) && !empty($backupDestination)) {
+    if (!empty($backupSources) /*&& !empty($backupDestination)*/) {
       $this->addCommandArray(array(
         'command' => 'filesystem:backup',
         'sources' => $backupSources,
@@ -95,13 +95,11 @@ class WebsiteDeployCommand extends CompositeCommand
         '--delete' => true,
       ), $output);
     }
-    
-    parent::initialize($input, $output);
   }
 
   protected function interact(InputInterface $input, OutputInterface $output)
   {
-    if (!$input->getOption('init'))
+//    if (!$input->getOption('init'))
       return;
 
     $options = array(

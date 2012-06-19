@@ -24,12 +24,12 @@ class BMultiCommand extends CompositeCommand
   {
     $this->addCommandArray(array(
       'command' => 'exec:c',
-      'c-arg' => 'c-by-b-'.$input->getArgument('b-arg'),
+      'c-arg' => 'c-by-b-' . $input->getArgument('b-arg'),
       ), $output);
 
     $this->addCommandArray(array(
       'command' => 'exec:leaf',
-      'leaf-arg' => 'l-by-b-'.$input->getArgument('b-arg'),
+      'leaf-arg' => 'l-by-b-' . $input->getArgument('b-arg'),
       ), $output);
   }
 

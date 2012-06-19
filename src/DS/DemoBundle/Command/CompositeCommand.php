@@ -10,11 +10,12 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use DS\DemoBundle\Command\Helper\DialogHelper;
+use DS\DemoBundle\Command\ClosureExecuteCommand;
 
 abstract class CompositeCommand extends Command
 {
 
-  protected $commands = array();
+  protected static $commands = array();
   protected $argumentValidators = array();
   protected $optionValidators = array();
 
@@ -66,12 +67,19 @@ abstract class CompositeCommand extends Command
   protected function addCommandArray(array $args, OutputInterface $output)
   {
     $command = $this->getApplication()->find($args['command']);
-    $input = new ArrayInput($args);
 
-    $this->commands[] = array(
-      'command' => $command,
-      'input' => $input,
-    );
+    if ($command instanceof CompositeCommand) {
+      unset($args['command']);
+      $input = new ArrayInput($args);
+      $input->bind($command->getDefinition());
+      $command->initialize($input, $output);
+    } else {
+      $input = new ArrayInput($args);
+      self::$commands[] = array(
+        'command' => $command,
+        'input' => $input,
+      );
+    }
   }
 
   protected function addCommandLine($commandLine, OutputInterface $output)
@@ -86,27 +94,24 @@ abstract class CompositeCommand extends Command
 
   protected function addCommandClosure(\Closure $closure)
   {
-    $command = new Command();
+    $command = new ClosureExecuteCommand();
     $command->setCode($closure);
 
-    $this->commands[] = array(
+    self::$commands[] = array(
       'command' => $command,
-      'input' => new ArrayInput(),
+      'input' => new ArrayInput(array()),
     );
   }
 
-//  protected function initialize(InputInterface $input, OutputInterface $output)
-//  {
-//    foreach ($this->commands as $command) {
-//      $command['command']->initialize($command['input'], $output);
-//    }
-//  }
-//  
   protected function execute(InputInterface $input, OutputInterface $output)
   {
     $exitCode = 0; //Ok
-
-    foreach ($this->commands as $command) {
+    echo "here composite\n";
+    var_dump(count(self::$commands));
+    foreach (self::$commands as $command) {
+      if (!$this->isForced($input)) {
+        $command['command']->setDryrun();
+      }
       $exitCode = $exitCode || $command['command']->run($command['input'], $output);
 
       if ($exitCode)

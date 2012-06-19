@@ -24,17 +24,17 @@ class AMultiCommand extends CompositeCommand
   {
     $this->addCommandArray(array(
       'command' => 'exec:b',
-      'b-arg' => 'b-by-a-'.$input->getArgument('a-arg'),
+      'b-arg' => 'b-by-a-' . $input->getArgument('a-arg'),
       ), $output);
 
     $this->addCommandArray(array(
       'command' => 'exec:c',
-      'c-arg' => 'c-by-a-'.$input->getArgument('a-arg'),
+      'c-arg' => 'c-by-a-' . $input->getArgument('a-arg'),
       ), $output);
 
     $this->addCommandArray(array(
       'command' => 'exec:leaf',
-      'leaf-arg' => 'l-by-a-'.$input->getArgument('a-arg'),
+      'leaf-arg' => 'l-by-a-' . $input->getArgument('a-arg'),
       ), $output);
   }
 

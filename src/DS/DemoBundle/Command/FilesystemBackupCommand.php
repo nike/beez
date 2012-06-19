@@ -20,9 +20,9 @@ class FilesystemBackupCommand extends CompositeCommand
       ->addArgument('destination', InputArgument::REQUIRED, 'Directory where to put the archive')
       ->addArgument('sources', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Directories to backup')
     ;
-    
+
     $this
-      ->addArgumentValidators('destination', array(new DirectoryExists()))
+//      ->addArgumentValidators('destination', array(new DirectoryExists()))
       ->addArgumentValidators('sources', array(new DirectoryExists()))
     ;
   }
@@ -30,7 +30,7 @@ class FilesystemBackupCommand extends CompositeCommand
   protected function initialize(InputInterface $input, OutputInterface $output)
   {
     $this->validateInput($input);
-    
+
     $sources = $input->getArgument('sources');
     foreach ($sources as $key => $source) {
       $sources[$key] = $this->sanitizeDirectory($source);
@@ -44,9 +44,13 @@ class FilesystemBackupCommand extends CompositeCommand
       $archiveName = sprintf('backup-%s.tar.gz', date('YmdHi', time()));
     }
 
-    $this->addCommandClosure(function() use ($destination) {
-        if (!is_dir($destination)) {
-          @mkdir($destination, 0777, true);
+    $this->addCommandClosure(function($input, $output) use ($destination) {
+        if ($input->getOption('dryrun')) {
+          $output->writeln('Closure command');
+        } else {
+          if (!is_dir($destination)) {
+            @mkdir($destination, 0777, true);
+          }
         }
       });
 

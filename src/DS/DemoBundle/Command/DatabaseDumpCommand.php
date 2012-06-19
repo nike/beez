@@ -28,7 +28,7 @@ class DatabaseDumpCommand extends CompositeCommand
     ;
   }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
+  protected function initialize(InputInterface $input, OutputInterface $output)
   {
     $this->validateInput($input);
 

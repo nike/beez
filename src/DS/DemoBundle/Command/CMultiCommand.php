@@ -24,12 +24,12 @@ class CMultiCommand extends CompositeCommand
   {
     $this->addCommandArray(array(
       'command' => 'exec:leaf',
-      'leaf-arg' => 'l-by-c-'.$input->getArgument('c-arg'),
+      'leaf-arg' => 'l-by-c-' . $input->getArgument('c-arg'),
       ), $output);
 
     $this->addCommandArray(array(
       'command' => 'exec:leaf',
-      'leaf-arg' => 'l-by-c-'.$input->getArgument('c-arg'),
+      'leaf-arg' => 'l-by-c-' . $input->getArgument('c-arg'),
       ), $output);
   }
 
