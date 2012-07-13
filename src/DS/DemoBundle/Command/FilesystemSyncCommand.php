@@ -13,54 +13,54 @@ use DS\DemoBundle\Command\Validator\FileExists;
 class FilesystemSyncCommand extends CompositeCommand
 {
 
-  protected function configure()
-  {
-    $this
-      ->setName('filesystem:sync')
-      ->setDescription('Synchronize two directories')
-      ->addArgument('source', InputArgument::REQUIRED, 'Source directory')
-      ->addArgument('target', InputArgument::REQUIRED, 'Directory to synchronize')
-      ->addOption('delete', '', InputOption::VALUE_NONE, 'Delete files on destination when synchronize')
-      ->addOption('include-file', '', InputOption::VALUE_REQUIRED, 'File that contains a list of include patterns')
-      ->addOption('exclude-file', '', InputOption::VALUE_REQUIRED, 'File that contains a list of exclude patterns')
-      ->addOption('owner', '', InputOption::VALUE_REQUIRED, 'Owner of the target directory')
-      ->addForceOption()
-    ;
-    
-    $this
-      ->addArgumentValidators('source', array(new DirectoryExists()))
-      ->addArgumentValidators('target', array(new DirectoryExists()))
-      ->addOptionValidators('include-file', array(new FileExists()))
-      ->addOptionValidators('exclude-file', array(new FileExists()))
-    ;
-  }
+    protected function configure()
+    {
+        $this
+            ->setName('filesystem:sync')
+            ->setDescription('Synchronize two directories')
+            ->addArgument('source', InputArgument::REQUIRED, 'Source directory')
+            ->addArgument('target', InputArgument::REQUIRED, 'Directory to synchronize')
+            ->addOption('delete', '', InputOption::VALUE_NONE, 'Delete files on destination when synchronize')
+            ->addOption('include-file', '', InputOption::VALUE_REQUIRED, 'File that contains a list of include patterns')
+            ->addOption('exclude-file', '', InputOption::VALUE_REQUIRED, 'File that contains a list of exclude patterns')
+            ->addOption('owner', '', InputOption::VALUE_REQUIRED, 'Owner of the target directory')
+            ->addForceOption()
+        ;
 
-  protected function initialize(InputInterface $input, OutputInterface $output)
-  {
-    $this->validateInput($input);
-    
-    $includeFile = $input->getOption('include-file');
-    $excludeFile = $input->getOption('exclude-file');
-    
-    if ($includeFile)
-      $includeFile = sprintf('--include-from "%s"', $includeFile);
-    
-    if ($excludeFile)
-      $excludeFile = sprintf('--exclude-from "%s"', $excludeFile);
+        $this
+            ->addArgumentValidators('source', array(new DirectoryExists()))
+            ->addArgumentValidators('target', array(new DirectoryExists()))
+            ->addOptionValidators('include-file', array(new FileExists()))
+            ->addOptionValidators('exclude-file', array(new FileExists()))
+        ;
+    }
 
-    $delete = $input->getOption('delete') ? '--delete' : '';
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $this->validateInput($input);
 
-    $source = $this->sanitizeDirectory($input->getArgument('source'));
-    $target = $this->sanitizeDirectory($input->getArgument('target'));
-    $dryRun = $this->isForced($input) ? '' : '--dry-run';
+        $includeFile = $input->getOption('include-file');
+        $excludeFile = $input->getOption('exclude-file');
 
-    $commandLine = sprintf('rsync -azoChpAv %s %s %s %s %s %s', $dryRun, $includeFile, $excludeFile, $delete, $source, $target);
+        if ($includeFile)
+            $includeFile = sprintf('--include-from "%s"', $includeFile);
 
-    $owner = $input->getOption('owner');
-    if ($owner)
-      $commandLine = sprintf('sudo -u %s %s', $owner, $commandLine);
-    
-    $this->addCommandLine($commandLine, $output);
-  }
+        if ($excludeFile)
+            $excludeFile = sprintf('--exclude-from "%s"', $excludeFile);
+
+        $delete = $input->getOption('delete') ? '--delete' : '';
+
+        $source = $this->sanitizeDirectory($input->getArgument('source'));
+        $target = $this->sanitizeDirectory($input->getArgument('target'));
+        $dryRun = $this->isForced($input) ? '' : '--dry-run';
+
+        $commandLine = sprintf('rsync -rzChv %s %s %s %s %s %s', $dryRun, $includeFile, $excludeFile, $delete, $source, $target);
+
+        $owner = $input->getOption('owner');
+        if ($owner)
+            $commandLine = sprintf('sudo -u %s %s', $owner, $commandLine);
+
+        $this->addCommandLine($commandLine, $output);
+    }
 
 }

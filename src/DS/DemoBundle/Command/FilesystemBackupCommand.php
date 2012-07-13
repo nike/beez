@@ -12,57 +12,54 @@ use DS\DemoBundle\Command\Validator\DirectoryExists;
 class FilesystemBackupCommand extends CompositeCommand
 {
 
-  protected function configure()
-  {
-    $this
-      ->setName('filesystem:backup')
-      ->setDescription('Backup directories')
-      ->addArgument('destination', InputArgument::REQUIRED, 'Directory where to put the archive')
-      ->addArgument('sources', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Directories to backup')
-    ;
+    protected function configure()
+    {
+        $this
+            ->setName('filesystem:backup')
+            ->setDescription('Backup directories')
+            ->addArgument('destination', InputArgument::REQUIRED, 'Directory where to put the archive')
+            ->addArgument('sources', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Directories to backup')
+        ;
 
-    $this
-//      ->addArgumentValidators('destination', array(new DirectoryExists()))
-      ->addArgumentValidators('sources', array(new DirectoryExists()))
-    ;
-  }
-
-  protected function initialize(InputInterface $input, OutputInterface $output)
-  {
-    $this->validateInput($input);
-
-    $sources = $input->getArgument('sources');
-    foreach ($sources as $key => $source) {
-      $sources[$key] = $this->sanitizeDirectory($source);
+        $this
+//            ->addArgumentValidators('destination', array(new DirectoryExists()))
+            ->addArgumentValidators('sources', array(new DirectoryExists()))
+        ;
     }
 
-    $destination = $this->sanitizeDirectory($input->getArgument('destination'));
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $this->validateInput($input);
 
-    if (count($sources) == 1) {
-      $archiveName = sprintf('%s-%s.tar.gz', basename($sources[0]), date('YmdHi', time()));
-    } else {
-      $archiveName = sprintf('backup-%s.tar.gz', date('YmdHi', time()));
-    }
-
-    $this->addCommandClosure(function($input, $output) use ($destination) {
-        if ($input->getOption('dryrun')) {
-          $output->writeln('Closure command');
-        } else {
-          if (!is_dir($destination)) {
-            @mkdir($destination, 0777, true);
-          }
+        $sources = $input->getArgument('sources');
+        foreach ($sources as $key => $source) {
+            $sources[$key] = $this->sanitizeDirectory($source);
         }
-      });
 
-    // Options:
-    // c: compress
-    // v: verbose
-    // z: gzip archive
-    // f: archive to file
-    // C: root dir in the archived file
-    $commandLine = sprintf('tar -czf %s/%s %s', $destination, $archiveName, implode(' ', $sources));
+        $destination = $this->sanitizeDirectory($input->getArgument('destination'));
 
-    $this->addCommandLine($commandLine, $output);
-  }
+        $date = date('YmdHi', time());
+        if (count($sources) == 1) {
+            $archiveName = sprintf('%s-%s.tar.gz', basename($sources[0]), $date);
+        } else {
+            $archiveName = sprintf('backup-%s.tar.gz', $date);
+        }
+
+        $this->addCommandClosure(function($input, $output) use ($destination) {
+                if (!is_dir($destination)) {
+                    @mkdir($destination, 0777, true);
+                }
+            });
+
+        // Options:
+        // c: compress
+        // v: verbose
+        // z: gzip archive
+        // f: archive to file
+        // C: root dir in the archived file
+        $commandLine = sprintf('tar -czf %s/%s %s', $destination, $archiveName, implode(' ', $sources));
+
+        $this->addCommandLine($commandLine, $output);
+    }
 
 }
