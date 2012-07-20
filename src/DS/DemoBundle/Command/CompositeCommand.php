@@ -109,9 +109,10 @@ abstract class CompositeCommand extends Command
 //        echo "here composite\n";
 //        var_dump(count(self::$commands));
         foreach (self::$commands as $command) {
-            if (!$this->isForced($input)) {
-                $command['command']->setDryrun();
-            }
+            // TODO: check this when implementig US2
+//            if (!$this->isForced($input)) {
+//                $command['command']->setDryrun();
+//            }
             
             $exitCode = $exitCode || $command['command']->run($command['input'], $output);
 
