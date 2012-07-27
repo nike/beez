@@ -26,7 +26,7 @@ class WebsiteDeployCommand extends CompositeCommand
       ->addOption('exclude-file', '', InputOption::VALUE_REQUIRED, 'Exclude file')
       ->addOption('include-file', '', InputOption::VALUE_REQUIRED, 'Include file')
       ->addOption('backup-sources', '', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Backup sources')
-      ->addOption('backup-destination', '', InputOption::VALUE_REQUIRED, 'Backup destination')
+      ->addOption('backup-destination', '', InputOption::VALUE_REQUIRED, 'Backup destination', './')
       ->addOption('db-name', '', InputOption::VALUE_REQUIRED, 'Database name')
       ->addOption('db-user', '', InputOption::VALUE_REQUIRED, 'Database user')
       ->addOption('db-pass', '', InputOption::VALUE_REQUIRED, 'Database pass')
@@ -40,8 +40,8 @@ class WebsiteDeployCommand extends CompositeCommand
       ->addOptionValidators('web-prod-dir', array(new Required(), new DirectoryExists()))
       ->addOptionValidators('exclude-file', array(new Required(), new FileExists()))
       ->addOptionValidators('include-file', array(new Required(), new FileExists()))
-      ->addOptionValidators('backup-sources', array(new Required(), new DirectoryExists()))
-//      ->addOptionValidators('backup-destination', array(new Required(), new DirectoryExists()))
+      ->addOptionValidators('backup-sources', array(new DirectoryExists()))
+      ->addOptionValidators('backup-destination', array(new DirectoryExists()))
     ;
   }
 
