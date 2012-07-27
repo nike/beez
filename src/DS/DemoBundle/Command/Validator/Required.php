@@ -7,14 +7,16 @@ use DS\DemoBundle\Command\Validator\Validator;
 class Required extends Validator
 {
 
-  public function validate($value)
-  {
-    if (empty($value)) {
-      $this->errorMessage = 'A value is required';
-      return false;
-    }
+    public function validate($value)
+    {
+        if (empty($value)) {
+            $this->errorMessage = 'A value is required';
+            return false;
+        }
+        
+        $this->errorMessage = '';
 
-    return true;
-  }
+        return true;
+    }
 
 }

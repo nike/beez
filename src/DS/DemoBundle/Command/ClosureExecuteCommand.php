@@ -11,17 +11,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ClosureExecuteCommand extends Command
 {
 
-  protected function configure()
-  {
-    $this
-      ->setName('closure:execute')
-      ->setDescription('Execute a closure')
-    ;
-  }
+    protected function configure()
+    {
+        $this
+            ->setName('closure:execute')
+            ->setDescription('Execute a closure')
+            ->addOption('dryrun', '', InputOption::VALUE_NONE, 'Do not execute command')
+        ;
+    }
 
-  protected function execute(InputInterface $input, OutputInterface $output)
-  {
-    throw new \LogicException('You must call setCode()');
-  }
-  
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        throw new \LogicException('You must call setCode()');
+    }
+
 }
