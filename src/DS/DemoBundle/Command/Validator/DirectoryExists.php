@@ -9,6 +9,7 @@ class DirectoryExists extends Validator
 
     public function validate($value)
     {
+        $this->errorMessage = '';
         $values = (array) $value;
 
         if (count($values) == 0)
@@ -26,8 +27,6 @@ class DirectoryExists extends Validator
             }
         }
 
-        $this->errorMessage = '';
-        
         return true;
     }
 
