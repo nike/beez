@@ -9,6 +9,11 @@ class FileExists extends Validator
 
     public function validate($value)
     {
+        $this->errorMessage = '';
+
+        if (empty($value))
+            return true;
+
         $values = (array) $value;
 
         if (count($values) == 0)
@@ -25,8 +30,6 @@ class FileExists extends Validator
                 return false;
             }
         }
-        
-        $this->errorMessage = '';
 
         return true;
     }

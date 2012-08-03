@@ -25,6 +25,29 @@ class FileExistsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($validator->validate($realFile));
         $this->assertEquals('', $validator->getErrorMessage());
+
+        $null = null;
+
+        $this->assertTrue($validator->validate($null));
+        $this->assertEquals('', $validator->getErrorMessage());
+
+        $emtpyString = '';
+
+        $this->assertTrue($validator->validate($emtpyString));
+        $this->assertEquals('', $validator->getErrorMessage());
+
+        $arrayFiles = array(
+            $fakeFile,
+            $realFile,
+        );
+
+        $this->assertFalse($validator->validate($arrayFiles));
+        $this->assertRegExp('/.*file.*not.*exist.*/', $validator->getErrorMessage());
+
+        $emptyArrayFiles = array();
+
+        $this->assertTrue($validator->validate($emptyArrayFiles));
+        $this->assertEquals('', $validator->getErrorMessage());
     }
 
 }

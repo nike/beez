@@ -10,6 +10,10 @@ class DirectoryExists extends Validator
     public function validate($value)
     {
         $this->errorMessage = '';
+
+        if (empty($value))
+            return true;
+
         $values = (array) $value;
 
         if (count($values) == 0)

@@ -9,12 +9,12 @@ class Required extends Validator
 
     public function validate($value)
     {
+        $this->errorMessage = '';
+
         if (empty($value)) {
             $this->errorMessage = 'A value is required';
             return false;
         }
-        
-        $this->errorMessage = '';
 
         return true;
     }
