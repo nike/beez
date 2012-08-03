@@ -18,6 +18,7 @@ abstract class CompositeCommand extends Command
     protected static $commands = array();
     protected $argumentValidators = array();
     protected $optionValidators = array();
+    protected $forced = null;
 
     protected function addConfigurationArgument()
     {
@@ -29,9 +30,17 @@ abstract class CompositeCommand extends Command
         return $this->addOption('force', 'x', InputOption::VALUE_NONE, 'Force execution');
     }
 
-    protected function isForced(InputInterface $input)
+    public function setForced($force)
     {
-        if ($input->hasOption('force'))
+        $this->forced = $force;
+    }
+    
+    public function isForced(InputInterface $input = null)
+    {
+        if (isset($this->forced))
+            return $this->forced;
+        
+        if (isset($input) && $input->hasOption('force'))
             return (true === $input->getOption('force'));
 
         return true;
@@ -106,13 +115,9 @@ abstract class CompositeCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $exitCode = 0; //Ok
-//        echo "here composite\n";
-//        var_dump(count(self::$commands));
+
         foreach (self::$commands as $command) {
-            // TODO: check this when implementig US2
-//            if (!$this->isForced($input)) {
-//                $command['command']->setDryrun();
-//            }
+            $command['command']->setForced($this->isForced($input));
             
             $exitCode = $exitCode || $command['command']->run($command['input'], $output);
 

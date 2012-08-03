@@ -93,7 +93,6 @@ class WebsiteDeployCommand extends CompositeCommand
         '--include-file' => $includeFile,
         '--exclude-file' => $excludeFile,
         '--delete' => true,
-        '--force' => $this->isForced($input),
       ), $output);
     }
   }

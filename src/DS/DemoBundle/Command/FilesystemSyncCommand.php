@@ -52,6 +52,7 @@ class FilesystemSyncCommand extends CompositeCommand
 
         $source = $this->sanitizeDirectory($input->getArgument('source'));
         $target = $this->sanitizeDirectory($input->getArgument('target'));
+        
         $dryRun = $this->isForced($input) ? '' : '--dry-run';
 
         $commandLine = sprintf('rsync -rzChv %s %s %s %s %s %s', $dryRun, $includeFile, $excludeFile, $delete, $source, $target);

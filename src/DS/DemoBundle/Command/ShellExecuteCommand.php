@@ -5,12 +5,18 @@ namespace DS\DemoBundle\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
 class ShellExecuteCommand extends Command
 {
+
+    private $forced = true;
+
+    public function setForced($force)
+    {
+        $this->forced = $force;
+    }
 
     protected function configure()
     {
@@ -18,18 +24,14 @@ class ShellExecuteCommand extends Command
             ->setName('shell:execute')
             ->setDescription('Execute a shell command line')
             ->addArgument('command-line', InputArgument::REQUIRED, 'Command line to execute')
-            ->addOption('dryrun', '', InputOption::VALUE_NONE, 'Do not execute command')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $commandLine = $input->getArgument('command-line');
-        $dryrun = $input->getOption('dryrun');
 
-        if ($dryrun) {
-            $output->writeln($commandLine);
-        } else {
+        if ($this->forced) {
             $process = new Process($commandLine);
 
             if ($process->run()) {
@@ -40,6 +42,8 @@ class ShellExecuteCommand extends Command
             } else {
                 $output->writeln(sprintf('<info>%s</info>', $process->getExitCodeText()));
             }
+        } else {
+            $output->writeln($commandLine);
         }
 
         // Ok
