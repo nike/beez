@@ -1,0 +1,8 @@
+project:
+  name: beez
+  description: 'beez is a project automation tool written in PHP'
+  bee:
+    enabled_plugins: null
+  repository:
+    directory: .
+    type: git
