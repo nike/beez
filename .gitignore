@@ -1,5 +1,3 @@
-/.netbeans/
-/vendor/.composer/
+/.netbeans/nbproject/private/
 /.beez/
-/.idea/
 /vendor/

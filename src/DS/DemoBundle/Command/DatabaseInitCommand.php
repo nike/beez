@@ -21,8 +21,8 @@ class DatabaseInitCommand extends CompositeCommand
             ->addArgument('db-name', InputArgument::REQUIRED, 'Database name')
             ->addArgument('db-user', InputArgument::REQUIRED, 'If user does not exist, it will be created')
             ->addArgument('db-pass', InputArgument::REQUIRED, 'Assign or change the password to the specified user')
-            ->addOption('mysql-user', 'u', InputOption::VALUE_OPTIONAL, 'Mysql username (if not set, default user is "root")')
-            ->addOption('mysql-pass', 'p', InputOption::VALUE_OPTIONAL, 'Mysql password (if not set, default no password)')
+            ->addOption('mysql-user', 'u', InputOption::VALUE_OPTIONAL, 'Mysql username (if not set default user is "root")')
+            ->addOption('mysql-pass', 'p', InputOption::VALUE_OPTIONAL, 'Mysql password (if not set password will be asked twice)', '')
         ;
     }
 
@@ -31,8 +31,8 @@ class DatabaseInitCommand extends CompositeCommand
         $dbName = $input->getArgument('db-name');
         $dbUser = $input->getArgument('db-user');
         $dbPass = $input->getArgument('db-pass');
-        $mysqlUser = $input->getOption('mysql-user') ? sprintf('-u %s', $input->getOption('mysql-user')) : '-u root';
-        $mysqlPass = $input->getOption('mysql-pass') ? sprintf('-p %s', $input->getOption('mysql-pass')) : '';
+        $mysqlUser = $input->getOption('mysql-user') ? sprintf('-u%s', $input->getOption('mysql-user')) : '-uroot';
+        $mysqlPass = $input->getOption('mysql-pass') ? sprintf('-p%s', $input->getOption('mysql-pass')) : '-p';
 
         $commandLine = sprintf('mysqladmin %s %s create %s', $mysqlUser, $mysqlPass, $dbName);
 
@@ -40,7 +40,7 @@ class DatabaseInitCommand extends CompositeCommand
 
         $sql = sprintf('grant all privileges on %s.* to \'%s\'@\'localhost\' identified by \'%s\'', $dbName, $dbUser, $dbPass);
         $commandLine = sprintf('mysql %s %s -e "%s"', $mysqlUser, $mysqlPass, $sql);
-        
+
         $this->addCommandLine($commandLine, $output);
     }
 

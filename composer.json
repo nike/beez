@@ -1,0 +1,16 @@
+{
+    "name": "beez",
+    "description": "The project automation tool",
+    "autoload": {
+        "psr-0": { "": "src/" }
+    },
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/console": "dev-master",
+        "symfony/class-loader": "dev-master",
+        "symfony/finder": "dev-master",
+        "symfony/process": "dev-master",
+        "symfony/yaml": "dev-master"
+    },
+    "minimum-stability": "dev"
+}
